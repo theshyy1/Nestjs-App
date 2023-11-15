@@ -1,0 +1,26 @@
+import { Module } from '@nestjs/common';
+import { AuthService } from './auth.service';
+import { AuthController } from './auth.controller';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from './user.entity';
+import { UsersRepository } from './users.repository';
+import { PassportModule } from '@nestjs/passport';
+import { JwtModule } from '@nestjs/jwt';
+import { JwtStrategy } from './jwt.strategy';
+
+@Module({
+    imports: [
+        TypeOrmModule.forFeature([User]), // tương tác vs db user entity
+        PassportModule.register({ defaultStrategy: 'jwt'}),  // dky strategies
+        JwtModule.register({   //cau hinh jwt
+            secret: 'jwt-secret',
+            signOptions: {
+                expiresIn: 3600
+            }
+        })
+    ],
+    controllers: [AuthController],
+    providers: [AuthService, UsersRepository, JwtStrategy],
+    exports: [JwtStrategy, PassportModule]
+})
+export class AuthModule {}

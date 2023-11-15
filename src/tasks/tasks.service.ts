@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Task } from './task.entity';
 import { TasksRepository } from './tasks.repository';
 import { Repository } from 'typeorm';
+import { User } from 'src/auth/user.entity';
 
 // Service là chịu trách nhiệm thực hiện các login, nghiệp vụ
 @Injectable()
@@ -14,44 +15,23 @@ export class TasksService {
         private tasksRepository: TasksRepository
     ) {}
 
-    getTaskById(id: string): Promise<Task> {
-        return this.tasksRepository.getTaskById(id);
+    getTaskById(id: string, user: User): Promise<Task> {
+        return this.tasksRepository.getTaskById(id, user);
     }
 
-    createTask(createTaskDto: CreateTaskDto): Promise<Task> {
-        return this.tasksRepository.createTask(createTaskDto);
+    createTask(createTaskDto: CreateTaskDto, user: User): Promise<Task> {
+        return this.tasksRepository.createTask(createTaskDto, user);
     }
 
-    getTasks(filterDto: GetTasksFilterDto): Promise<Task[]> {
-        return this.tasksRepository.getTasks(filterDto);
+    getTasks(filterDto: GetTasksFilterDto, user: User): Promise<Task[]> {
+        return this.tasksRepository.getTasks(filterDto, user);
     }
 
-    deleteTask(id: string): Promise<void> {
-        return this.tasksRepository.deleteTask(id);
+    deleteTask(id: string, user: User): Promise<void> {
+        return this.tasksRepository.deleteTask(id, user);
     }
     
-    updateTask(id: string, status: TaskStatus): Promise<Task> {
-        return this.tasksRepository.updateTask(id, status);
+    updateTask(id: string, status: TaskStatus, user: User): Promise<Task> {
+        return this.tasksRepository.updateTask(id, status, user);
     }
-
-    // getTasksWithFilter(filterDto: GetTasksFilterDto) {
-    //     const { status, search } = filterDto;
-    //     let tasks = this.getAllTasks();
-
-    //     if(status) {
-    //         tasks = tasks.filter(task => task.status === status);
-    //     }
-    //     if(search) {
-    //         tasks = tasks.filter(task => {
-    //             if(task.title.includes(search) || task.description.includes(search)) {
-    //                 return true;
-    //             }       
-    //             return false;
-    //         })
-    //     }
-    //     return tasks;
-    // }
-
-   
-
 }
