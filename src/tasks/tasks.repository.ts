@@ -1,7 +1,7 @@
 import { InjectRepository } from "@nestjs/typeorm";
 import { Task } from "./task.entity";
 import { Repository } from "typeorm";
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, InternalServerErrorException, Logger, NotFoundException } from "@nestjs/common";
 import { CreateTaskDto } from "./dto/create-task.dto";
 import { TaskStatus } from "./task-status.enum";
 import { GetTasksFilterDto } from "./dto/get-tasks-filter.dto";
@@ -11,10 +11,11 @@ import { User } from "src/auth/user.entity";
 // Now, place to handle logic main 
 @Injectable()
 export class TasksRepository {
-   constructor(
-    @InjectRepository(Task)
-    private readonly taskEntityRepository: Repository<Task>
-   ) {}
+    constructor(
+        @InjectRepository(Task)
+        private readonly taskEntityRepository: Repository<Task>
+    ) {}
+    private logger = new Logger('TaskRepository');
 
     async createTask(createTaskDto: CreateTaskDto, user: User): Promise<Task> {
         const { title, description } = createTaskDto;
@@ -48,8 +49,13 @@ export class TasksRepository {
             )
         }
 
-        const tasks = await query.getMany();
-        return tasks;
+        try {
+            const tasks = await query.getMany();
+            return tasks;
+        } catch (error) {
+            this.logger.error(`Failed to get tasks with ${user.username}`, error.stack)
+            throw new InternalServerErrorException();
+        }
     }
 
     async getTaskById(id: string, user: User): Promise<Task> {
